@@ -6,11 +6,11 @@ Steps:
 - [x] Get ffmpeg tracked and installed if not available
 - [x] Get user file selection working (support recursive folders and mirror the structure in output)
 - [x] Convert audio files to mp3
-- [ ] Add a progress bar
+- [x] Add a progress bar
+- [x] Multithreaded conversion (multiple songs at once)
 - [ ] Convert to aiff
 - [ ] Copy metadata from mp3 to aiff
 - [ ] Add optional output for (wav and flac)
 - [ ] Try to save that in a non-annoying way
-- [ ] Multithreaded conversion (multiple songs at once)
 - [ ] Package the app for distribution (PyInstaller? Briefcase?)
 - [ ] Write proper README
