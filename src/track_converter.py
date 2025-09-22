@@ -25,18 +25,23 @@ class TrackConverter:
 		self.output_parent = self.input.parent
 
 
-	def _convert_single_file(self, audio_path: Path, converter: converters.base.BaseConverter) -> Path:
+	def _convert_single_file(self, audio_path: Path, converter: converters.base.BaseConverter) -> tuple[Path, bool]: # Returns true if skipped
 		# Figure out the proper output path and ensure it exists
 		relative_path = audio_path.relative_to(self.input)
 		output_path = self.output_parent / (self.input.name + "_" + converter.extension) / relative_path.with_suffix("." + converter.extension)
 		output_path.parent.mkdir(parents=True, exist_ok=True)
+
+		# Skip if output exists (we assume it's identical, otherwise it would cost the same to check)
+		if output_path.exists():
+			return output_path, True
 		
 		converter.convert(str(audio_path), str(output_path))
-		return output_path
+		return output_path, False
 
-	def _convert_parallel(self, audio_paths: list[Path], converter: converters.base.BaseConverter) -> dict[str, str]:
+	def _convert_parallel(self, audio_paths: list[Path], converter: converters.base.BaseConverter) -> tuple[dict[str, str], list[str]]:
 		max_workers = min(os.cpu_count(), MAX_WORKERS)
 		conversion_errors = []
+		skipped_files = []
 		converted_files = {}
 
 		with Progress() as progress:
@@ -58,11 +63,13 @@ class TrackConverter:
 					audio_path = future_to_path[future]
 
 					try:
-						result = future.result()
+						result, skipped = future.result()
 					except Exception as e:
 						conversion_errors.append((audio_path, str(e)))
 					else: 
 						converted_files[str(audio_path)] = str(result)
+						if skipped:
+							skipped_files.append(str(audio_path))
 					finally:
 						file_progress.remove_task(file_progress_tasks[audio_path])
 						progress.advance(task_id)
@@ -75,7 +82,7 @@ class TrackConverter:
 			output.warn(f"Could not convert {audio_path}")
 			output.error(error_msg)
 
-		return converted_files
+		return converted_files, skipped_files
 
 
 	def run(self) -> None:
@@ -87,15 +94,19 @@ class TrackConverter:
 		def convert_format(converter: converters.base.BaseConverter) -> dict[str, str]: # Input -> Output audio paths for each succesful conversion
 			output.info(f"Converting {len(audio_paths)} tracks to {str.upper(converter.extension)}...")
 			
-			converted_succesfully = self._convert_parallel(audio_paths=audio_paths, converter=self._converters[converter.extension])
+			converted, skipped = self._convert_parallel(audio_paths=audio_paths, converter=self._converters[converter.extension])
 			
-			if len(converted_succesfully) == len(audio_paths):
+			# Report skipped files
+			if skipped:
+				output.info(f"Skipped {len(skipped)} tracks because they are identical.")
+
+			if len(converted) == len(audio_paths):
 				output.success(f"All {len(audio_paths)} tracks converted to {str.upper(converter.extension)} successfully!")
 			else:
-				output.info(f"{len(audio_paths) - len(converted_succesfully)} tracks could not be converted to {str.upper(converter.extension)}. See above for details.")
+				output.info(f"{len(audio_paths) - len(converted)} tracks could not be converted to {str.upper(converter.extension)}. See above for details.")
 			
-			return converted_succesfully
-
+			return converted
+		
 		with Progress() as progress:
 			output.console = progress.console # Use main progress console for output to keep things tidy
 			task_id = progress.add_task("Converting tracks", total=(len(self.additional_converters) + 1) * len(audio_paths))

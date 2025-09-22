@@ -11,6 +11,7 @@ Steps:
 - [x] Improve error handling
 - [x] Convert to aiff
 - [x] Copy metadata from mp3 to aiff
+- [x] Check if existing file is identical and skip conversion if so
 - [ ] Add optional output for (wav and flac)
 - [ ] Try to save that in a non-annoying way
 - [ ] Package the app for distribution (PyInstaller? Briefcase?)
