@@ -14,9 +14,9 @@ def main():
 	if len(args) == 2:
 			user_path = args[1]
 	else:
-		user_path = output.prompt("Drag a folder into this window and press Enter", DEFAULT_FOLDER)
+		user_path = output.prompt("Drag a folder into this window or type the path and press Enter", DEFAULT_FOLDER)
 		if os.path.isdir(user_path):
-			print("Using input folder: " + user_path)
+			output.info("Using input folder: " + user_path)
 		else:
 			output.error(f"No input folder specified and no '{DEFAULT_FOLDER}' folder found in current directory")
 			sys.exit(1)
