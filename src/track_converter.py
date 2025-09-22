@@ -3,6 +3,7 @@ import converters.base
 import converters.mp3
 import converters.aiff
 import os
+import sys
 import output
 
 from pathlib import Path
@@ -18,11 +19,7 @@ class TrackConverter:
 			"aiff": converters.aiff.AIFFConverter()
 		}
 
-		self.enabled_converters = {}
-		self.enabled_converters["mp3"] = True
-		self.enabled_converters["aiff"] = False
-		self.enabled_converters["wav"] = False
-		self.enabled_converters["flac"] = False
+		self.additional_converters = {} # Other than mp3, by extension/converter name from above
 
 		self.input = Path(input)
 		self.output_parent = self.input.parent
@@ -37,9 +34,10 @@ class TrackConverter:
 		converter.convert(str(audio_path), str(output_path))
 		return output_path
 
-	def _convert_parallel(self, audio_paths: list[Path], converter: converters.base.BaseConverter) -> int:
+	def _convert_parallel(self, audio_paths: list[Path], converter: converters.base.BaseConverter) -> dict[str, str]:
 		max_workers = min(os.cpu_count(), MAX_WORKERS)
 		conversion_errors = []
+		converted_files = {}
 
 		with Progress() as progress:
 			task_id = progress.add_task(f"Converting to {str.upper(converter.extension)}", total=len(audio_paths))
@@ -50,20 +48,22 @@ class TrackConverter:
 				file_progress_tasks = {}
 
 				future_to_path = {}
-				for audio_path in audio_paths:
-					file_progress_tasks[audio_path] = file_progress.add_task(file.shorten_filename(audio_path.with_suffix("").name + "." + converter.extension), total=None)
-					
-					future = executor.submit(self._convert_single_file, audio_path, converter)
-					future_to_path[future] = audio_path
+				for input_path in audio_paths:
+					file_progress_tasks[input_path] = file_progress.add_task(file.shorten_filename(input_path.with_suffix("").name + "." + converter.extension), total=None)
+
+					future = executor.submit(self._convert_single_file, input_path, converter)
+					future_to_path[future] = input_path
 				
 				for future in as_completed(future_to_path.keys()):
+					audio_path = future_to_path[future]
+
 					try:
-						future.result()
+						result = future.result()
 					except Exception as e:
-						audio_path = future_to_path[future]
 						conversion_errors.append((audio_path, str(e)))
+					else: 
+						converted_files[str(audio_path)] = str(result)
 					finally:
-						audio_path = future_to_path[future]
 						file_progress.remove_task(file_progress_tasks[audio_path])
 						progress.advance(task_id)
 
@@ -75,7 +75,7 @@ class TrackConverter:
 			output.warn(f"Could not convert {audio_path}")
 			output.error(error_msg)
 
-		return len(audio_paths) - len(conversion_errors)
+		return converted_files
 
 
 	def run(self) -> None:
@@ -84,12 +84,36 @@ class TrackConverter:
 			audio_paths = file.get_audio_paths(self.input)
 			progress.remove_task(read_task)
 
-		self.enabled_converters["mp3"] = True # Ensure mp3 is always enabled!
+		def convert_format(converter: converters.base.BaseConverter) -> dict[str, str]: # Input -> Output audio paths for each succesful conversion
+			output.info(f"Converting {len(audio_paths)} tracks to {str.upper(converter.extension)}...")
+			
+			converted_succesfully = self._convert_parallel(audio_paths=audio_paths, converter=self._converters[converter.extension])
+			
+			if len(converted_succesfully) == len(audio_paths):
+				output.success(f"All {len(audio_paths)} tracks converted to {str.upper(converter.extension)} successfully!")
+			else:
+				output.info(f"{len(audio_paths) - len(converted_succesfully)} tracks could not be converted to {str.upper(converter.extension)}. See above for details.")
+			
+			return converted_succesfully
 
-		for converter_name, enabled in self.enabled_converters.items():
-			if enabled and converter_name in self._converters:
-				converted_succesfully = self._convert_parallel(audio_paths=audio_paths, converter=self._converters[converter_name])
-				if converted_succesfully == len(audio_paths):
-					output.success(f"All files converted to {str.upper(converter_name)} successfully!")
+		with Progress() as progress:
+			output.console = progress.console # Use main progress console for output to keep things tidy
+			task_id = progress.add_task("Converting tracks", total=(len(self.additional_converters) + 1) * len(audio_paths))
+			
+			mp3_converted = convert_format(self._converters["mp3"]) # Always convert to mp3 (necessary for other formats)
+			progress.update(task_id, advance=len(audio_paths))
+
+			# Convert all other formats
+			for converter_name in self.additional_converters:
+				converter = self._converters.get(converter_name)
+				if converter:
+					converter.mp3_paths = mp3_converted
+					convert_format(converter)
+					progress.update(task_id, advance=len(audio_paths))
 				else:
-					output.info(f"Some files could not be converted to {str.upper(converter_name)}. See above for details.")
+					output.error(f"Unknown converter {str.upper(converter.extension)}.")
+					sys.exit(1)
+
+			progress.remove_task(task_id)
+			progress.stop()
+

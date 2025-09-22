@@ -5,16 +5,17 @@ from rich.console import Console
 console = Console()
 
 def error(message: str):
-	rprint(f"❌[bold red] Error: {message} [/bold red]")
+	console.print(f"❌[bold red] Error: {message} [/bold red]")
 
 def warn(message: str):
-	rprint(f"⚠️ [bold yellow] {message} [/bold yellow]")
+	console.print(f"⚠️ [bold yellow] {message} [/bold yellow]")
 
 def success(message: str):
-	rprint(f"✅[bold green] {message} [/bold green]")
+	console.print(f"✅[bold green] {message} [/bold green]")
 
 def info(message: str):
-	rprint(f"ℹ️[bold blue]  {message} [/bold blue]") # Extra space due to crappy emoji width
+	# Extra space due to crappy emoji width
+	console.print(f"ℹ️[bold blue]  {message} [/bold blue]")
 
 def prompt(message: str, default: str) -> str:
-	return Prompt.get_input(console, prompt=f"💬 {message} [bold blue][Default: {default}][/bold blue]: ", password=False).strip() or default
+	return Prompt.get_input(prompt=f"💬 {message} [bold blue][Default: {default}][/bold blue]: ", password=False, console=console).strip() or default

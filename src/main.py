@@ -22,7 +22,7 @@ def main():
 			sys.exit(1)
 
 	track_converter = TrackConverter(user_path)
-	track_converter.enabled_converters["aiff"] = True
+	track_converter.additional_converters = ["aiff"]
 
 	# Optional parameters can be set here before running
 
