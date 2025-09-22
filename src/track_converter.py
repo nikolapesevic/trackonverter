@@ -123,7 +123,6 @@ class TrackConverter:
 					progress.update(task_id, advance=len(audio_paths))
 				else:
 					output.error(f"Unknown converter {str.upper(converter.extension)}.")
-					sys.exit(1)
 
 			progress.remove_task(task_id)
 			progress.stop()
