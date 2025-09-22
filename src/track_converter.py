@@ -1,6 +1,7 @@
 import file
 import converters.base
 import converters.mp3
+import converters.aiff
 import os
 import output
 
@@ -13,7 +14,8 @@ MAX_WORKERS = 8
 class TrackConverter:
 	def __init__(self, input: str) -> None:
 		self._converters = {
-			"mp3": converters.mp3.MP3Converter()
+			"mp3": converters.mp3.MP3Converter(),
+			"aiff": converters.aiff.AIFFConverter()
 		}
 
 		self.enabled_converters = {}
@@ -91,5 +93,3 @@ class TrackConverter:
 					output.success(f"All files converted to {str.upper(converter_name)} successfully!")
 				else:
 					output.info(f"Some files could not be converted to {str.upper(converter_name)}. See above for details.")
-
-		
