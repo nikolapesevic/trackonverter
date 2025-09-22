@@ -35,7 +35,7 @@ class TrackConverter:
 		converter.convert(str(audio_path), str(output_path))
 		return output_path
 
-	def _convert_parallel(self, audio_paths: list[Path], converter: converters.base.BaseConverter) -> None:
+	def _convert_parallel(self, audio_paths: list[Path], converter: converters.base.BaseConverter) -> int:
 		max_workers = min(os.cpu_count(), MAX_WORKERS)
 		conversion_errors = []
 
@@ -71,6 +71,9 @@ class TrackConverter:
 		# Display any errors that occurred after progress is complete
 		for audio_path, error_msg in conversion_errors:
 			output.warn(f"Could not convert {audio_path}")
+			output.error(error_msg)
+
+		return len(audio_paths) - len(conversion_errors)
 
 
 	def run(self) -> None:
@@ -83,6 +86,10 @@ class TrackConverter:
 
 		for converter_name, enabled in self.enabled_converters.items():
 			if enabled and converter_name in self._converters:
-				self._convert_parallel(audio_paths=audio_paths, converter=self._converters[converter_name])
+				converted_succesfully = self._convert_parallel(audio_paths=audio_paths, converter=self._converters[converter_name])
+				if converted_succesfully == len(audio_paths):
+					output.success(f"All files converted to {str.upper(converter_name)} successfully!")
+				else:
+					output.info(f"Some files could not be converted to {str.upper(converter_name)}. See above for details.")
 
 		

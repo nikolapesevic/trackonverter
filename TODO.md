@@ -8,6 +8,7 @@ Steps:
 - [x] Convert audio files to mp3
 - [x] Add a progress bar
 - [x] Multithreaded conversion (multiple songs at once)
+- [x] Improve error handling
 - [ ] Convert to aiff
 - [ ] Copy metadata from mp3 to aiff
 - [ ] Add optional output for (wav and flac)

@@ -13,7 +13,7 @@ class MP3Converter(BaseConverter):
 		self.bitrate = "320k"
 
 	def convert(self, input: str, output: str) -> None:
-		command = [
+		self._run([
 			ffmpeg.ffmpeg_path, "-y", "-i", input,
 			"-map_metadata", "0", "-map", "0",
 			"-ar", str(self.sample_rate),
@@ -23,5 +23,4 @@ class MP3Converter(BaseConverter):
 			"-id3v2_version", str(self._id3_version),
 			output,
 			"-loglevel", self._ffmpeg_log_level
-		]
-		subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+		])

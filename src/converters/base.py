@@ -1,5 +1,6 @@
 from pathlib import Path
 from abc import ABC, abstractmethod
+import subprocess
 
 class BaseConverter(ABC):
 	def __init__(self):
@@ -13,6 +14,14 @@ class BaseConverter(ABC):
 		self.sample_format = ""
 		self.codec = ""
 		self.bitrate = ""
+
+	def _run(self, command: list[str]) -> None:
+		try:
+			subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+		except subprocess.CalledProcessError as e:
+			# Capture ffmpeg error output and raise with meaningful message
+			error_msg = e.stderr.strip() if e.stderr else f"Command failed with exit code {e.returncode}"
+			raise RuntimeError(f"FFmpeg conversion failed: {error_msg}") from e
 
 	@abstractmethod
 	def convert(self) -> None:
