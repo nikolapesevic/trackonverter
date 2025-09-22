@@ -1,11 +1,11 @@
 Steps:
-- [ ] General project setup and .gitignore
-- [ ] Set up a proper VSCode environment with a python venv - Use Poetry
-- [ ] Set up a hello world python project
-- [ ] Get dependencies installed
-- [ ] Get ffmpeg tracked and installed if not available
-- [ ] Get user file selection working (support recursive folders and mirror the structure in output)
-- [ ] Convert audio files to mp3
+- [x] General project setup and .gitignore
+- [x] Set up a proper VSCode environment with a python venv - Use Poetry
+- [x] Set up a hello world python project
+- [x] Get dependencies installed
+- [x] Get ffmpeg tracked and installed if not available
+- [x] Get user file selection working (support recursive folders and mirror the structure in output)
+- [x] Convert audio files to mp3
 - [ ] Add a progress bar
 - [ ] Convert to aiff
 - [ ] Copy metadata from mp3 to aiff
