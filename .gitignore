@@ -3,6 +3,10 @@
 
 # Ignore tracks so we can test a folder quickly
 tracks/
+tracks_mp3/
+tracks_aiff/
+tracks_wav/
+tracks_flac/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
