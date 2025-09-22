@@ -1,24 +1,27 @@
-from . import base
+from .base import BaseConverter
 import ffmpeg
 import subprocess
 
-EXTENSION = "mp3"
-SAMPLE_RATE = 44100
-SAMPLE_FORMAT = "s16p"
-CODEC = "libmp3lame"
-BITRATE = "320k"
+class MP3Converter(BaseConverter):
+	def __init__(self):
+		super().__init__()
 
-class MP3Converter(base.BaseConverter):
+		self.extension = "mp3"
+		self.sample_rate = 44100
+		self.sample_format = "s16p"
+		self.codec = "libmp3lame"
+		self.bitrate = "320k"
+
 	def convert(self, input: str, output: str) -> None:
 		command = [
 			ffmpeg.ffmpeg_path, "-y", "-i", input,
 			"-map_metadata", "0", "-map", "0",
-			"-ar", str(SAMPLE_RATE),
-			"-sample_fmt", SAMPLE_FORMAT,
-			"-c:a", CODEC,
-			"-b:a", BITRATE,
-			"-id3v2_version", str(base.ID3_VERSION),
+			"-ar", str(self.sample_rate),
+			"-sample_fmt", self.sample_format,
+			"-c:a", self.codec,
+			"-b:a", self.bitrate,
+			"-id3v2_version", str(self._id3_version),
 			output,
-			"-loglevel", base.FFMPEG_LOG_LEVEL
+			"-loglevel", self._ffmpeg_log_level
 		]
-		subprocess.run(command, check=True)
+		subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

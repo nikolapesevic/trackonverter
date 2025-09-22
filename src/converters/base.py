@@ -1,14 +1,19 @@
 from pathlib import Path
 from abc import ABC, abstractmethod
 
-# FFmpeg configuration
-FFMPEG_LOG_LEVEL = "error"
-
-# Metadata configuration
-ID3_VERSION = 3
-ID3_ENCODING = 3
-
 class BaseConverter(ABC):
+	def __init__(self):
+		# Default settings (override in subclasses as needed)
+		self._ffmpeg_log_level = "error"
+		self._id3_version = 3
+		self._id3_encoding = 3
+
+		self.extension = ""
+		self.sample_rate = 44100
+		self.sample_format = ""
+		self.codec = ""
+		self.bitrate = ""
+
 	@abstractmethod
-	def convert(self, audio: Path, output_root: Path) -> None:
+	def convert(self) -> None:
 		pass
