@@ -12,7 +12,10 @@ Steps:
 - [x] Convert to aiff
 - [x] Copy metadata from mp3 to aiff
 - [x] Check if existing file is identical and skip conversion if so
-- [ ] Add optional output for (wav and flac)
-- [ ] Try to save that in a non-annoying way
+- [ ] Improve progress bar visuals
 - [ ] Package the app for distribution (PyInstaller? Briefcase?)
 - [ ] Write proper README
+
+Update:
+- [ ] Add optional output for (wav and flac)
+- [ ] Try to save that in a non-annoying way

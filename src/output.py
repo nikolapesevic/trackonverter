@@ -1,4 +1,3 @@
-from rich import print as rprint
 from rich.prompt import Prompt
 from rich.console import Console
 

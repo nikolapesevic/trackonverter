@@ -1,6 +1,5 @@
 from .base import BaseConverter
 import ffmpeg
-import subprocess
 
 class MP3Converter(BaseConverter):
 	def __init__(self):
