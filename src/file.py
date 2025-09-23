@@ -4,7 +4,7 @@ import ffmpeg
 import subprocess
 import os
 
-def shorten_filename(filename: str, max_length: int = 30) -> str:
+def shorten_filename(filename: str, max_length: int = 60) -> str:
 	if len(filename) <= max_length:
 		return filename
 
