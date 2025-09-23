@@ -1,14 +1,14 @@
 import file
+import os
+import output
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from rich.progress import Progress, BarColumn, TextColumn, TimeRemainingColumn, MofNCompleteColumn, SpinnerColumn
+
 import converters.base
 import converters.mp3
 import converters.aiff
-import os
-import sys
-import output
 
-from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from rich.progress import Progress
 
 MAX_WORKERS = 8
 
@@ -38,17 +38,24 @@ class TrackConverter:
 		converter.convert(str(audio_path), str(output_path))
 		return output_path, False
 
-	def _convert_parallel(self, audio_paths: list[Path], converter: converters.base.BaseConverter) -> tuple[dict[str, str], list[str]]:
+	def _convert_parallel(self, audio_paths: list[Path], converter: converters.base.BaseConverter, callback) -> tuple[dict[str, str], list[str]]:
 		max_workers = min(os.cpu_count(), MAX_WORKERS)
 		conversion_errors = []
 		skipped_files = []
 		converted_files = {}
 
-		with Progress() as progress:
+		with Progress(
+			TextColumn("[progress.description]{task.description}"),
+			BarColumn(complete_style="green"),
+			MofNCompleteColumn(),
+		) as progress:
 			task_id = progress.add_task(f"Converting to {str.upper(converter.extension)}", total=len(audio_paths))
 
 			with ThreadPoolExecutor(max_workers=max_workers) as executor:
-				file_progress = Progress()
+				file_progress = Progress(
+					SpinnerColumn(),
+					TextColumn("[progress.description]{task.description}")
+				)
 				file_progress.start()
 				file_progress_tasks = {}
 
@@ -73,6 +80,7 @@ class TrackConverter:
 					finally:
 						file_progress.remove_task(file_progress_tasks[audio_path])
 						progress.advance(task_id)
+						callback()
 
 				file_progress.stop()
 			progress.remove_task(task_id)
@@ -91,10 +99,8 @@ class TrackConverter:
 			audio_paths = file.get_audio_paths(self.input)
 			progress.remove_task(read_task)
 
-		def convert_format(converter: converters.base.BaseConverter) -> dict[str, str]: # Input -> Output audio paths for each succesful conversion
-			output.info(f"Converting {len(audio_paths)} tracks to {str.upper(converter.extension)}...")
-			
-			converted, skipped = self._convert_parallel(audio_paths=audio_paths, converter=self._converters[converter.extension])
+		def convert_format(converter: converters.base.BaseConverter, callback) -> dict[str, str]: # Input -> Output audio paths for each succesful conversion
+			converted, skipped = self._convert_parallel(audio_paths=audio_paths, converter=self._converters[converter.extension], callback=callback)
 			
 			# Report skipped files
 			if skipped:
@@ -107,19 +113,26 @@ class TrackConverter:
 			
 			return converted
 		
-		with Progress() as progress:
+		with Progress(
+			TextColumn("[progress.description]{task.description}"),
+			BarColumn(complete_style="green"),
+			MofNCompleteColumn(),
+			TimeRemainingColumn(),
+		) as progress:
 			output.console = progress.console # Use main progress console for output to keep things tidy
 			task_id = progress.add_task("Converting tracks", total=(len(self.additional_converters) + 1) * len(audio_paths))
 			
-			mp3_converted = convert_format(self._converters["mp3"]) # Always convert to mp3 (necessary for other formats)
-			progress.update(task_id, advance=len(audio_paths))
+			def file_completed():
+				progress.advance(task_id)
+
+			mp3_converted = convert_format(self._converters["mp3"], file_completed) # Always convert to mp3 (necessary for other formats)
 
 			# Convert all other formats
 			for converter_name in self.additional_converters:
 				converter = self._converters.get(converter_name)
 				if converter:
 					converter.mp3_paths = mp3_converted
-					convert_format(converter)
+					convert_format(converter, file_completed)
 					progress.update(task_id, advance=len(audio_paths))
 				else:
 					output.error(f"Unknown converter {str.upper(converter.extension)}.")

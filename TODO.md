@@ -12,7 +12,7 @@ Steps:
 - [x] Convert to aiff
 - [x] Copy metadata from mp3 to aiff
 - [x] Check if existing file is identical and skip conversion if so
-- [ ] Improve progress bar visuals
+- [x] Improve progress bar visuals
 - [ ] Package the app for distribution (PyInstaller? Briefcase?)
 - [ ] Write proper README
 
