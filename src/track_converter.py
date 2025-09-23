@@ -31,7 +31,7 @@ class TrackConverter:
 		output_path = self.output_parent / (self.input.name + "_" + converter.extension) / relative_path.with_suffix("." + converter.extension)
 		output_path.parent.mkdir(parents=True, exist_ok=True)
 
-		# Skip if output exists (we assume it's identical, otherwise it would cost the same to check)
+		# Skip if output exists (we assume it's identical, otherwise it would be expensive to check)
 		if output_path.exists():
 			return output_path, True
 		
@@ -59,11 +59,13 @@ class TrackConverter:
 				file_progress.start()
 				file_progress_tasks = {}
 
+				def execute_conversion(path):
+					file_progress_tasks[path] = file_progress.add_task(file.shorten_filename(path.with_suffix("").name + "." + converter.extension), total=None)
+					return self._convert_single_file(path, converter)
+
 				future_to_path = {}
 				for input_path in audio_paths:
-					file_progress_tasks[input_path] = file_progress.add_task(file.shorten_filename(input_path.with_suffix("").name + "." + converter.extension), total=None)
-
-					future = executor.submit(self._convert_single_file, input_path, converter)
+					future = executor.submit(execute_conversion, input_path)
 					future_to_path[future] = input_path
 				
 				for future in as_completed(future_to_path.keys()):
