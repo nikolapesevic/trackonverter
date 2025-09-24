@@ -19,10 +19,12 @@ jobs:
         include:
           - os: windows-latest
             platform: windows
-            executable: Trackonverter.exe
+            artifact_name: trackonverter-windows.exe
+            artifact_path: dist/trackonverter.exe
           - os: macos-latest
             platform: macos
-            executable: Trackonverter
+            artifact_name: trackonverter-macos.zip
+            artifact_path: trackonverter-macos.zip
     
     steps:
     - uses: actions/checkout@v4
@@ -47,17 +49,30 @@ jobs:
     - name: Build with PyInstaller
       run: poetry run pyinstaller trackonverter.spec
     
+    - name: Package macOS App Bundle
+      if: matrix.platform == 'macos'
+      run: |
+        cd dist
+        zip -r ../trackonverter-macos.zip Trackonverter.app
+        cd ..
+    
+    - name: Rename Windows executable
+      if: matrix.platform == 'windows'
+      run: |
+        move dist\trackonverter.exe dist\trackonverter-windows.exe
+      shell: cmd
+    
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.executable }}
-        path: dist/${{ matrix.executable }}
+        name: ${{ matrix.artifact_name }}
+        path: ${{ matrix.artifact_path }}
     
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: dist/${{ matrix.executable }}
+        files: ${{ matrix.artifact_path }}
         name: Release ${{ github.ref_name }}
         draft: true
         prerelease: false

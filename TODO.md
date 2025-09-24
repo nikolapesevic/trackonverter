@@ -14,4 +14,8 @@ Steps:
 - [x] Check if existing file is identical and skip conversion if so
 - [x] Improve progress bar visuals
 - [x] Write proper README
-- [ ] Package the app for distribution (PyInstaller? Briefcase?)
+- [x] Package the app for distribution (PyInstaller? Briefcase?)
+- [x] Update README to instruct user on how to use an unsigned app on MacOS
+- [x] Use app bundle on mac os
+- [x] Make sure GitHub build actions work
+- [ ] Add Icon to the packaged app

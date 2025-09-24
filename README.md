@@ -29,7 +29,12 @@ These formats are chosen for their wide compatibility with Pioneer DJ software a
 Trackonverter depends on [ffmpeg](https://ffmpeg.org/) to handle audio conversion. Make sure ffmpeg is installed and accessible in your system's PATH. You will be prompted to manually download and install ffmpeg if it is not found.
 
 ### 1. Download and Run
-If you just want to use the app, download the latest release from the [Releases](https://github.com/nikolapesevic/trackonverter/releases) page and run the program for Windows/MacOS. 
+If you just want to use the app, download the latest release from the [Releases](https://github.com/nikolapesevic/trackonverter/releases) page:
+
+**Windows**: Download `trackonverter-windows.exe` and double-click to run.
+
+**macOS**: Download `trackonverter-macos.zip`, extract it, and double-click `Trackonverter.app` to run. 
+- On first run, macOS may show a security warning. Go to System Preferences → Security & Privacy and click "Open Anyway"
 
 ### 2. Track Selection
 There is a plethora of ways you can run Trackonverter on a specific folder:

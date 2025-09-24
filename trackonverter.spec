@@ -1,4 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
+import platform
 
 block_cipher = None
 
@@ -41,3 +42,24 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+
+# Create macOS App Bundle
+if platform.system() == 'Darwin':
+    app = BUNDLE(
+        exe,
+        name='Trackonverter.app',
+        icon=None,
+        bundle_identifier='com.trackonverter.app',
+        version='1.0.0',
+        info_plist={
+            'NSHighResolutionCapable': 'True',
+            'CFBundleShortVersionString': '1.0.0',
+            'CFBundleVersion': '1.0.0',
+            'CFBundleExecutable': 'trackonverter',
+            'CFBundleName': 'Trackonverter',
+            'CFBundleDisplayName': 'Trackonverter',
+            'CFBundleIdentifier': 'com.trackonverter.app',
+            'CFBundlePackageType': 'APPL',
+            'LSApplicationCategoryType': 'public.app-category.utilities',
+        },
+    )
