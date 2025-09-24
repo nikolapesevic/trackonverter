@@ -6,7 +6,7 @@ authors = [
     {name = "triankl3",email = "25014845+triankl3@users.noreply.github.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.15"
 dependencies = [
     "mutagen (>=1.47.0,<2.0.0)",
     "rich (>=14.1.0,<15.0.0)",
@@ -15,6 +15,9 @@ dependencies = [
 [tool.poetry]
 package-mode = false
 packages = [{include = ".", from = "src"}]
+
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
