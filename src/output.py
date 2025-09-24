@@ -15,7 +15,7 @@ def success(message: str):
 
 def info(message: str):
 	# Extra space due to crappy emoji width
-	console.print(f"ℹ️[bold blue]  {message} [/bold blue]")
+	console.print(f"ℹ️[bold]  {message} [/bold]")
 
 def prompt(message: str, default: str) -> str:
 	return Prompt.get_input(prompt=f"💬 {message} [bold blue][Default: {default}][/bold blue]: ", password=False, console=console).strip() or default

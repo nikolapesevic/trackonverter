@@ -24,6 +24,7 @@ class TrackConverter:
 		self.input = Path(input)
 		self.output_parent = self.input.parent
 
+		self._total_completed = 0
 
 	def _convert_single_file(self, audio_path: Path, converter: converters.base.BaseConverter) -> tuple[Path, bool]: # Returns true if skipped
 		# Figure out the proper output path and ensure it exists
@@ -75,14 +76,15 @@ class TrackConverter:
 						result, skipped = future.result()
 					except Exception as e:
 						conversion_errors.append((audio_path, str(e)))
+						callback(False)
 					else: 
+						callback(True)
 						converted_files[str(audio_path)] = str(result)
 						if skipped:
 							skipped_files.append(str(audio_path))
 					finally:
 						file_progress.remove_task(file_progress_tasks[audio_path])
 						progress.advance(task_id)
-						callback()
 
 				file_progress.stop()
 			progress.remove_task(task_id)
@@ -96,6 +98,8 @@ class TrackConverter:
 
 
 	def run(self) -> None:
+		self._total_completed = 0
+
 		with Progress() as progress:
 			read_task = progress.add_task("Reading audio files", total=None)
 			audio_paths = file.get_audio_paths(self.input)
@@ -106,12 +110,10 @@ class TrackConverter:
 			
 			# Report skipped files
 			if skipped:
-				output.info(f"Skipped {len(skipped)} tracks because they are identical.")
+				output.info(f"Skipped {len(skipped)} tracks because the {str.upper(converter.extension)} already exists.")
 
-			if len(converted) == len(audio_paths):
-				output.success(f"All {len(audio_paths)} tracks converted to {str.upper(converter.extension)} successfully!")
-			else:
-				output.info(f"{len(audio_paths) - len(converted)} tracks could not be converted to {str.upper(converter.extension)}. See above for details.")
+			if len(converted) != len(audio_paths):
+				output.warn(f"{len(audio_paths) - len(converted)} tracks could not be converted to {str.upper(converter.extension)}. See above for details.")
 			
 			return converted
 		
@@ -124,8 +126,10 @@ class TrackConverter:
 			output.console = progress.console # Use main progress console for output to keep things tidy
 			task_id = progress.add_task("Converting tracks", total=(len(self.additional_converters) + 1) * len(audio_paths))
 			
-			def file_completed():
+			def file_completed(success: bool) -> None:
 				progress.advance(task_id)
+				if success:
+					self._total_completed += 1
 
 			mp3_converted = convert_format(self._converters["mp3"], file_completed) # Always convert to mp3 (necessary for other formats)
 
@@ -135,9 +139,13 @@ class TrackConverter:
 				if converter:
 					converter.mp3_paths = mp3_converted
 					convert_format(converter, file_completed)
-					progress.update(task_id, advance=len(audio_paths))
 				else:
 					output.error(f"Unknown converter {str.upper(converter.extension)}.")
+
+			if self._total_completed == len(audio_paths) * (len(self.additional_converters) + 1):
+				output.success(f"All {self._total_completed} tracks processed successfully!")
+			else:
+				output.warn(f"{self._total_completed} out of {len(audio_paths) * (len(self.additional_converters) + 1)} tracks processed.")
 
 			progress.remove_task(task_id)
 			progress.stop()

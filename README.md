@@ -6,7 +6,7 @@ Convert audio files to MP3 and AIFF formats while preserving metadata and direct
 - Preserves metadata (ID3 tags, album art, etc.) during conversion
 - Multithreaded conversion for faster processing
 - Mirrors nested directory structure and file names in the output directory
-- Skips conversion if the output file already exists and is identical
+- Skips conversion if the output file already exists
 
 ### Exported Formats
 The input tracks are exported in the following formats:
