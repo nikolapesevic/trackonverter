@@ -57,4 +57,7 @@ In the same folder where the input folder is located, new folders will appear wi
 3. Run `poetry run python src/main.py` to start the application. *VSCode users can also use `Run Task -> Run.`*
 
 ### Building the executables
-1. Push a version tag to GitHub and the action will run the build process.
+
+1. Perform the steps in "Running from source" first.
+2. Run `poetry run python build.py` to create local executables for Windows or macOS.
+3. **Or**, push a version tag to GitHub and the action will run the build process and create a new draft release automatically.
