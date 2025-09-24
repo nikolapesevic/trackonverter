@@ -1,6 +1,13 @@
 # Trackonverter
 Convert audio files to MP3 and AIFF formats while preserving metadata and directory structure in the best supported formats for Pioneer DJ software/hardware.
 
+### Features
+- Convert various audio formats to MP3 and AIFF (Any input format that [ffmpeg](https://ffmpeg.org/) supports)
+- Preserves metadata (ID3 tags, album art, etc.) during conversion
+- Multithreaded conversion for faster processing
+- Mirrors nested directory structure and file names in the output directory
+- Skips conversion if the output file already exists and is identical
+
 ### Exported Formats
 The input tracks are exported in the following formats:
 
@@ -17,13 +24,6 @@ These formats are chosen for their wide compatibility with Pioneer DJ software a
 3. Certain metadata fields may not be perfectly preserved due to format limitations, we try our best to map them correctly.
 4. MP3s have to be generated, as they are used to extract metadata from the input tracks. *It's much more convenient to convert metadata from MP3 -> AIFF than any format -> AIFF directly.*
 5. Already existing converted files will be skipped, but no checks are made if the file is actually identical for performance reasons. If you want to re-convert, delete the output folders first.
-
-## Features
-- Convert various audio formats to MP3 and AIFF (Any input format that [ffmpeg](https://ffmpeg.org/) supports)
-- Preserves metadata (ID3 tags, album art, etc.) during conversion
-- Multithreaded conversion for faster processing
-- Mirrors nested directory structure and file names in the output directory
-- Skips conversion if the output file already exists and is identical
 
 ## Usage
 Trackonverter depends on [ffmpeg](https://ffmpeg.org/) to handle audio conversion. Make sure ffmpeg is installed and accessible in your system's PATH. You will be prompted to manually download and install ffmpeg if it is not found.
