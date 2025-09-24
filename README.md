@@ -11,10 +11,10 @@ Convert audio files to MP3 and AIFF formats while preserving metadata and direct
 ### Exported Formats
 The input tracks are exported in the following formats:
 
-| Format | Sample Rate | Bitrate | Bit Depth | Channels | Extension |
+| Format | Sample Rate | Bitrate | Bit Depth | Codec | Extension |
 |---|---|---|---|---|---|
-|MP3 | 44100Hz | 320kbps CBR  | N/A   | Stereo | .mp3  |
-|AIFF| 44100Hz | 1411kbps CBR | 16bit | Stereo | .aiff |
+|MP3 | 44100Hz | 320kbps CBR  | N/A   | libmp3lame | .mp3  |
+|AIFF| 44100Hz | 1411kbps CBR | 16bit | pcm_s16be  | .aiff |
 
 These formats are chosen for their wide compatibility with Pioneer DJ software and hardware while also preserving metadata effectively.
 
