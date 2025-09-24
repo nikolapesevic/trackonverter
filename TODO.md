@@ -13,9 +13,5 @@ Steps:
 - [x] Copy metadata from mp3 to aiff
 - [x] Check if existing file is identical and skip conversion if so
 - [x] Improve progress bar visuals
+- [x] Write proper README
 - [ ] Package the app for distribution (PyInstaller? Briefcase?)
-- [ ] Write proper README
-
-Update:
-- [ ] Add optional output for (wav and flac)
-- [ ] Try to save that in a non-annoying way
