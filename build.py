@@ -50,6 +50,9 @@ def main():
         if os.path.exists(old_path):
             shutil.move(old_path, new_path)
             print(f"Renamed to {new_path}")
+            print("Single-file Windows executable created successfully!")
+        else:
+            print("Warning: Windows executable not found at expected path")
     
     print("Build completed!")
     
