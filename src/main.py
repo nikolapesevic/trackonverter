@@ -26,8 +26,6 @@ def launch_in_terminal():
 	subprocess.run(['osascript', '-e', applescript])
 
 def main():
-	print(os.getcwd())
-
 	# If running from app bundle and no terminal is attached, launch in Terminal
 	if is_app_bundle() and not sys.stdin.isatty() and '--terminal' not in sys.argv:
 		launch_in_terminal()
