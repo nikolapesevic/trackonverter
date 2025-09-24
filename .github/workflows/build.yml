@@ -20,7 +20,7 @@ jobs:
           - os: windows-latest
             platform: windows
             artifact_name: trackonverter-windows.exe
-            artifact_path: dist/trackonverter.exe
+            artifact_path: dist/trackonverter-windows.exe
           - os: macos-latest
             platform: macos
             artifact_name: trackonverter-macos.zip
