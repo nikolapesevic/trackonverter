@@ -3,6 +3,14 @@ import platform
 
 block_cipher = None
 
+# Determine icon based on platform
+if platform.system() == 'Windows':
+    icon_file = 'icon.ico'
+elif platform.system() == 'Darwin':
+    icon_file = 'icon.icns'
+else:
+    icon_file = None
+
 a = Analysis(
     ['src/main.py'],
     pathex=[],
@@ -37,6 +45,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=icon_file,
 )
 
 coll = COLLECT(
@@ -55,7 +64,7 @@ if platform.system() == 'Darwin':
     app = BUNDLE(
         coll,
         name='Trackonverter.app',
-        icon=None,
+        icon='icon.icns',
         bundle_identifier='com.trackonverter.app',
         version='1.0.0',
         info_plist={
