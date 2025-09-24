@@ -59,7 +59,7 @@ jobs:
     - name: Rename Windows executable
       if: matrix.platform == 'windows'
       run: |
-        move dist\trackonverter\trackonverter.exe dist\trackonverter-windows.exe
+        move dist\trackonverter.exe dist\trackonverter-windows.exe
       shell: cmd
     
     - name: Upload artifact
