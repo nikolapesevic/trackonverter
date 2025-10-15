@@ -1,24 +1,41 @@
 [project]
 name = "trackonverter"
-version = "2.0.1"
-description = ""
-authors = [
-    {name = "triankl3",email = "25014845+triankl3@users.noreply.github.com"}
-]
+version = "2.0.0"
+# description = ""
 readme = "README.md"
-requires-python = ">=3.13,<3.15"
+requires-python = ">=3.9"
+authors = [
+    { name = "Nikola Pesevic", email = "contact@nikolapesevic.com" }
+]
 dependencies = [
-    "mutagen (>=1.47.0,<2.0.0)",
-    "rich (>=14.1.0,<15.0.0)",
+  "flet==0.28.3"
+]
+
+[tool.flet]
+# org name in reverse domain name notation, e.g. "com.trackonverter".
+# Combined with project.name to build bundle ID for iOS and Android apps
+org = "com.trackonverter"
+
+# project display name that is used as an app title on Android and iOS home screens,
+# shown in window titles and about app dialogs on desktop.
+product = "trackonverter"
+
+# company name to display in about app dialogs
+company = "Trackonverter"
+
+# copyright text to display in about app dialogs
+copyright = "MIT License"
+
+[tool.flet.app]
+path = "src"
+
+[tool.uv]
+dev-dependencies = [
+    "flet[all]==0.28.3",
 ]
 
 [tool.poetry]
 package-mode = false
-packages = [{include = ".", from = "src"}]
 
 [tool.poetry.group.dev.dependencies]
-pyinstaller = "^6.0.0"
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+flet = {extras = ["all"], version = "0.28.3"}
