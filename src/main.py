@@ -43,9 +43,13 @@ def main():
 					output.info("Using input folder: " + user_path)
 				else:
 					output.error(f"No input folder specified and no '{DEFAULT_FOLDER}' folder found in current directory")
+					return
 
 			track_converter = TrackConverter(user_path)
-			track_converter.additional_converters = ["aiff"]
+
+			if output.prompt("Do you want to enable AIFF conversion? (y/n)", "n").lower() == "y":
+				track_converter.additional_converters = ["aiff"]
+
 			track_converter.run()
 		except KeyboardInterrupt:
 			output.info("Interupted by user")
